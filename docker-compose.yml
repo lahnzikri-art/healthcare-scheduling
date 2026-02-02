@@ -37,6 +37,25 @@ services:
       - healthcare-network
     restart: unless-stopped
 
+  patient-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
+    container_name: healthcare-patient
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/auth_db
+      JWT_SECRET: dev-secret-key-change-in-production
+      JWT_EXPIRES_IN: 30m
+      PORT: 3002
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    restart: unless-stopped
+
 networks:
   healthcare-network:
     driver: bridge
