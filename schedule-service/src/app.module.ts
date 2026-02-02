@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { PatientsModule } from './patients/patients.module';
+import { CustomersModule } from './customers/customers.module';
+import { DoctorsModule } from './doctors/doctors.module';
+import { SchedulesModule } from './schedules/schedules.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
@@ -20,7 +22,9 @@ import { AppService } from './app.service';
       csrfPrevention: false,
     }),
     PrismaModule,
-    PatientsModule,
+    CustomersModule,
+    DoctorsModule,
+    SchedulesModule,
     AuthModule,
   ],
   controllers: [AppController],
