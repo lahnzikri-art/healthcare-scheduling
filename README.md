@@ -5,6 +5,7 @@ Microservice-based healthcare scheduling system built with NestJS, GraphQL, Post
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+- [⚠️ Security Notice](#️-security-notice)
 - [Architecture](#architecture)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
@@ -47,6 +48,27 @@ Healthcare Scheduling System enables clinics to manage consultation schedules be
 - Foreign key validation (Customer & Doctor must exist)
 - Filter by customerId or doctorId
 - Pagination support
+
+---
+
+## ⚠️ Security Notice
+
+**IMPORTANT:** This repository contains **development-only** configuration with default credentials.
+
+🚨 **Before Production Deployment:**
+
+1. **Change all default passwords** (PostgreSQL, JWT_SECRET)
+2. **Review SECURITY.md** for comprehensive security guidelines
+3. **Never commit** `.env` files or secrets to git
+4. **Use strong secrets** (minimum 32 characters for JWT_SECRET)
+5. **Enable HTTPS/TLS** with reverse proxy
+6. **Restrict database ports** (remove external exposure)
+
+**Current Credentials (Development Only):**
+- PostgreSQL: `postgres:postgres` ⚠️
+- JWT Secret: `dev-secret-key-change-in-production` ⚠️
+
+See [SECURITY.md](SECURITY.md) for detailed security best practices.
 
 ---
 
