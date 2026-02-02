@@ -12,6 +12,7 @@ Microservice-based healthcare scheduling system built with NestJS, GraphQL, Post
 - [Services](#services)
 - [Environment Variables](#environment-variables)
 - [GraphQL API Examples](#graphql-api-examples)
+- [Email Notifications](#-email-notifications)
 - [Testing](#testing)
 - [Development](#development)
 - [Project Structure](#project-structure)
@@ -48,6 +49,7 @@ Healthcare Scheduling System enables clinics to manage consultation schedules be
 - Foreign key validation (Customer & Doctor must exist)
 - Filter by customerId or doctorId
 - Pagination support
+- **📧 Email Notifications** - Automatic emails to customers on schedule create/delete
 
 ---
 
@@ -827,6 +829,93 @@ curl -s http://localhost:3002/graphql \
 - [ ] Schedule Service - Filter schedules by customerId
 - [ ] Schedule Service - Filter schedules by doctorId
 - [ ] Schedule Service - Pagination
+
+---
+
+## 📧 Email Notifications
+
+### Overview
+
+The system automatically sends email notifications to customers when:
+- ✅ **Schedule Created** - Confirmation email with appointment details
+- ✅ **Schedule Deleted** - Cancellation notice with original appointment info
+
+### Features
+
+- **Non-blocking** - Schedule operations succeed even if email fails
+- **Professional HTML templates** - Responsive design with appointment details
+- **Error resilience** - Graceful failure handling with logging
+- **Development testing** - Mailhog for local email preview
+- **Production ready** - SMTP configuration for Gmail/SendGrid/AWS SES
+
+### Mailhog (Development Email Testing)
+
+**Access Mailhog Web UI:** http://localhost:8025
+
+View all emails sent by the application in a local web interface.
+
+```bash
+# Check sent emails
+curl http://localhost:8025/api/v2/messages
+
+# Clear all emails
+curl -X DELETE http://localhost:8025/api/v1/messages
+```
+
+### Email Templates
+
+**Schedule Confirmation Email:**
+- Subject: "Schedule Confirmation - Healthcare Scheduling"
+- Contains: Objective, Doctor name, Date & Time
+- Color: Green header
+
+**Schedule Cancellation Email:**
+- Subject: "Schedule Cancellation - Healthcare Scheduling"  
+- Contains: Cancelled appointment details
+- Color: Red header
+
+### Production Configuration
+
+For production, update `.env` in schedule-service:
+
+```env
+# Replace Mailhog with real SMTP
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USER=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_FROM=noreply@healthcare.com
+```
+
+**Supported Email Providers:**
+- Gmail (smtp.gmail.com:587)
+- SendGrid (smtp.sendgrid.net:587)
+- AWS SES
+- Mailgun
+- Custom SMTP server
+
+### Testing Email Notifications
+
+1. **Start services with Mailhog:**
+   ```bash
+   docker compose up -d
+   ```
+
+2. **Create a schedule** (via GraphQL or Postman)
+
+3. **Open Mailhog:** http://localhost:8025
+
+4. **Verify email received** with correct details
+
+### Technical Implementation
+
+- **Library:** `@nestjs-modules/mailer` + `nodemailer`
+- **Template Engine:** Handlebars (.hbs files)
+- **Location:** `schedule-service/src/mail/`
+- **Service:** `MailService` with async sending
+- **Integration:** `SchedulesService.create()` and `SchedulesService.remove()`
+
+See `EMAIL_NOTIFICATION_IMPLEMENTATION.md` for detailed technical documentation.
 
 ---
 
