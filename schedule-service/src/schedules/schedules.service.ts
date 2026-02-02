@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateScheduleInput } from './dto/create-schedule.input';
 import { FilterScheduleInput } from './dto/filter-schedule.input';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class SchedulesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+  ) {}
 
   async create(data: CreateScheduleInput) {
     // 1. Validate Customer exists
@@ -42,7 +46,7 @@ export class SchedulesService {
     }
 
     // 4. Create schedule
-    return this.prisma.schedule.create({
+    const schedule = await this.prisma.schedule.create({
       data: {
         objective: data.objective,
         customerId: data.customerId,
@@ -54,6 +58,19 @@ export class SchedulesService {
         doctor: true,
       },
     });
+
+    // 5. Send email notification (async, don't block)
+    this.mailService.sendScheduleCreated(
+      customer.email,
+      customer.name,
+      {
+        objective: schedule.objective,
+        doctorName: doctor.name,
+        scheduledAt: schedule.scheduledAt,
+      },
+    ).catch(err => this.prisma['$log']?.error('Email sending failed:', err));
+
+    return schedule;
   }
 
   async findAll(filter?: FilterScheduleInput, skip?: number, take?: number) {
@@ -96,7 +113,18 @@ export class SchedulesService {
   }
 
   async remove(id: string) {
-    await this.findOne(id);
+    const schedule = await this.findOne(id);
+
+    // Send email notification before deletion
+    this.mailService.sendScheduleDeleted(
+      schedule.customer.email,
+      schedule.customer.name,
+      {
+        objective: schedule.objective,
+        doctorName: schedule.doctor.name,
+        scheduledAt: schedule.scheduledAt,
+      },
+    ).catch(err => this.prisma['$log']?.error('Email sending failed:', err));
 
     await this.prisma.schedule.delete({
       where: { id },

@@ -55,12 +55,24 @@ services:
       JWT_SECRET: dev-secret-key-change-in-production  # ⚠️ MUST MATCH auth-service JWT_SECRET
       JWT_EXPIRES_IN: 30m
       PORT: 3002
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_FROM: noreply@healthcare.com
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - healthcare-network
     restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: healthcare-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - healthcare-network
 
 networks:
   healthcare-network:
