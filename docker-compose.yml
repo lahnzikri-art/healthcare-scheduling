@@ -37,15 +37,15 @@ services:
       - healthcare-network
     restart: unless-stopped
 
-  patient-service:
+  schedule-service:
     build:
-      context: ./patient-service
+      context: ./schedule-service
       dockerfile: Dockerfile
-    container_name: healthcare-patient
+    container_name: healthcare-schedule
     ports:
       - "3002:3002"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/auth_db
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/schedule_db
       JWT_SECRET: dev-secret-key-change-in-production
       JWT_EXPIRES_IN: 30m
       PORT: 3002
